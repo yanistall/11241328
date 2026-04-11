@@ -1,4 +1,3 @@
-
 :root {
   --bg:         #F5F2EE;
   --bg-card:    #FDFBF8;
@@ -303,14 +302,6 @@ section {
 .exp-item:hover { background: var(--accent-dim); margin: 0 -1rem; padding: 2rem 1rem; }
 
 .exp-meta { padding-top: 0.2rem; }
-.exp-period {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  display: block;
-  margin-bottom: 0.35rem;
-}
 .exp-company {
   font-family: var(--mono);
   font-size: 0.7rem;
@@ -330,22 +321,6 @@ section {
   line-height: 1.85;
   max-width: 60ch;
   margin-bottom: 1rem;
-}
-.exp-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-.exp-tag {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  border: 1px solid var(--line);
-  padding: 0.3em 0.7em;
-  border-radius: 2px;
 }
 
 .exp-evidence {
@@ -405,27 +380,7 @@ section {
   display: block;
   pointer-events: none;
 }
-.carousel-slide.has-image .carousel-placeholder { display: none; }
 
-.carousel-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #E8E4DE 0%, #D5CFC7 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  color: var(--ink-muted);
-  opacity: 0.6;
-}
-.carousel-placeholder svg { opacity: 0.4; }
-.carousel-placeholder span {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
 
 .carousel-footer {
   display: flex;
