@@ -12,7 +12,12 @@
 <body>
   <nav>
     <a href="#" class="nav-logo">個人履歷</a>
-    <ul class="nav-links">
+    <button class="nav-toggle" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="site-nav-links">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links" id="site-nav-links">
       <li><a href="#about">關於我</a></li>
       <li><a href="#experience">經歷</a></li>
       <li><a href="#skills">技能</a></li>
@@ -99,6 +104,7 @@
           <div class="exp-evidence">
             <span class="evidence-label">實際成果</span>
             <div class="evidence-carousel">
+              <button class="carousel-control prev" type="button" aria-label="上一張成果">‹</button>
               <div class="carousel-track">
                 <div class="carousel-slide">
                   <img src="image/Ustart1.png" alt="Ustart1" />
@@ -107,6 +113,7 @@
                   <img src="image/Ustart2.png" alt="Ustart2" />
                 </div>
               </div>
+              <button class="carousel-control next" type="button" aria-label="下一張成果">›</button>
               <div class="carousel-footer">
                 <div class="carousel-dots"></div>
                 <div class="carousel-hint">左右滑動查看更多</div>
@@ -130,6 +137,7 @@
           <div class="exp-evidence">
             <span class="evidence-label">實際成果</span>
             <div class="evidence-carousel">
+              <button class="carousel-control prev" type="button" aria-label="上一張成果">‹</button>
               <div class="carousel-track">
                 <div class="carousel-slide">
                   <img src="image/ai_interview_1.png" alt="ai interview 1" />
@@ -141,6 +149,7 @@
                   <img src="image/ai_interview_3.png" alt="ai interview 3" />
                 </div>
               </div>
+              <button class="carousel-control next" type="button" aria-label="下一張成果">›</button>
               <div class="carousel-footer">
                 <div class="carousel-dots"></div>
                 <div class="carousel-hint">左右滑動查看更多</div>
@@ -287,49 +296,100 @@
     <div class="footer-accent"></div>
   </footer>
 
+  <button class="back-to-top" type="button" aria-label="回到頁面頂端">↑</button>
+
   <script>
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add('visible'), i * 80);
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const barObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.skill-bar-fill').forEach((fill, i) => {
-              fill.style.width = (parseFloat(fill.dataset.level) * 100) + '%';
-              setTimeout(() => fill.classList.add('animated'), i * 120 + 200);
-            });
-            barObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-    document.querySelectorAll('.skill-card').forEach(card => barObserver.observe(card));
+    const nav = document.querySelector('nav');
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    const navAnchors = Array.from(document.querySelectorAll('.nav-links a'));
+    const backToTop = document.querySelector('.back-to-top');
 
-    document.querySelectorAll('header .reveal').forEach((el, i) => {
-      setTimeout(() => el.classList.add('visible'), 300 + i * 180);
+    function setMenuState(isOpen) {
+      if (!nav || !navToggle || !navLinks) return;
+      nav.classList.toggle('open', isOpen);
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.setAttribute('aria-label', isOpen ? '關閉選單' : '開啟選單');
+    }
+
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', () => {
+        const isOpen = nav.classList.contains('open');
+        setMenuState(!isOpen);
+      });
+
+      navAnchors.forEach(anchor => {
+        anchor.addEventListener('click', () => setMenuState(false));
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) setMenuState(false);
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setMenuState(false);
     });
+
+    const revealElements = document.querySelectorAll('.reveal');
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => entry.target.classList.add('visible'), i * 80);
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+      revealElements.forEach(el => revealObserver.observe(el));
+      document.querySelectorAll('header .reveal').forEach((el, i) => {
+        setTimeout(() => el.classList.add('visible'), 300 + i * 180);
+      });
+    } else {
+      revealElements.forEach(el => el.classList.add('visible'));
+    }
+
+    const barCards = document.querySelectorAll('.skill-card');
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      const barObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.querySelectorAll('.skill-bar-fill').forEach((fill, i) => {
+                fill.style.width = (parseFloat(fill.dataset.level) * 100) + '%';
+                setTimeout(() => fill.classList.add('animated'), i * 120 + 200);
+              });
+              barObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      barCards.forEach(card => barObserver.observe(card));
+    } else {
+      document.querySelectorAll('.skill-bar-fill').forEach(fill => {
+        fill.style.width = (parseFloat(fill.dataset.level) * 100) + '%';
+        fill.classList.add('animated');
+      });
+    }
 
     document.querySelectorAll('.evidence-carousel').forEach(carousel => {
       const track = carousel.querySelector('.carousel-track');
       const slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
       const dotsContainer = carousel.querySelector('.carousel-dots');
       const hint = carousel.querySelector('.carousel-hint');
-      if (!track || !slides.length) return;
+      const prevBtn = carousel.querySelector('.carousel-control.prev');
+      const nextBtn = carousel.querySelector('.carousel-control.next');
+      if (!track || !slides.length || !dotsContainer) return;
 
       const wrapper = document.createElement('div');
       wrapper.className = 'carousel-track-wrapper';
+      wrapper.tabIndex = 0;
       track.parentNode.insertBefore(wrapper, track);
       wrapper.appendChild(track);
 
@@ -338,22 +398,29 @@
 
       function updateDots() {
         dots.forEach((d, i) => d.classList.toggle('active', i === current));
-        if (current > 0) hint.classList.add('hidden');
+        if (hint && current > 0) hint.classList.add('hidden');
+        if (prevBtn) prevBtn.disabled = current === 0;
+        if (nextBtn) nextBtn.disabled = current === slides.length - 1;
       }
 
       function goTo(index, behavior = 'smooth') {
         current = Math.max(0, Math.min(index, slides.length - 1));
-        wrapper.scrollTo({ left: current * wrapper.clientWidth, behavior });
+        wrapper.scrollTo({ left: current * wrapper.clientWidth, behavior: reduceMotion ? 'auto' : behavior });
         updateDots();
       }
 
       slides.forEach((_, i) => {
-        const dot = document.createElement('span');
+        const dot = document.createElement('button');
+        dot.type = 'button';
         dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', `查看第 ${i + 1} 張成果`);
         dot.addEventListener('click', () => goTo(i));
         dotsContainer.appendChild(dot);
         dots.push(dot);
       });
+
+      if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
+      if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
 
       let raf = null;
       wrapper.addEventListener('scroll', () => {
@@ -368,10 +435,61 @@
         });
       }, { passive: true });
 
+      wrapper.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          goTo(current + 1);
+        }
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          goTo(current - 1);
+        }
+      });
+
       new ResizeObserver(() => {
         wrapper.scrollTo({ left: current * wrapper.clientWidth, behavior: 'auto' });
       }).observe(wrapper);
+
+      updateDots();
     });
+
+    const sectionIds = ['about', 'experience', 'skills', 'contact'];
+    const sectionElements = sectionIds
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+
+    function setActiveLink(activeId) {
+      navAnchors.forEach(link => {
+        const targetId = link.getAttribute('href')?.replace('#', '');
+        link.classList.toggle('active', targetId === activeId);
+      });
+    }
+
+    if ('IntersectionObserver' in window && sectionElements.length) {
+      const sectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) setActiveLink(entry.target.id);
+          });
+        },
+        { threshold: 0.45, rootMargin: '-25% 0px -45% 0px' }
+      );
+      sectionElements.forEach(section => sectionObserver.observe(section));
+    }
+
+    function handleScrollUI() {
+      if (!backToTop) return;
+      backToTop.classList.toggle('visible', window.scrollY > 520);
+    }
+
+    window.addEventListener('scroll', handleScrollUI, { passive: true });
+    handleScrollUI();
+
+    if (backToTop) {
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    }
   </script>
 
 </body>
